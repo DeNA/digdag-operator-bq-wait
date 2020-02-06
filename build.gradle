@@ -53,15 +53,30 @@ shadowJar {
     }
 }
 
+def github_repo = System.getenv 'github_repo'
+def github_user = System.getenv 'github_user'
+def github_token = System.getenv 'github_token'
+
 publishing {
     publications {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
         }
     }
+
     repositories {
         maven {
+            name = 'local'
             url "$buildDir/repo"
+        }
+
+        maven {
+            name = 'github_packages'
+            url 'https://maven.pkg.github.com/' + github_repo
+            credentials {
+                username = github_user
+                password = github_token
+            }
         }
     }
 }
