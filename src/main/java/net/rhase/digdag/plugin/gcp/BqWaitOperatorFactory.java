@@ -1,11 +1,15 @@
 /* Licensed under Apache-2.0 */
 package net.rhase.digdag.plugin.gcp;
 
+import com.google.api.gax.rpc.FixedHeaderProvider;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryException;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
+import com.google.cloud.bigquery.BigQueryOptions.Builder;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -25,7 +29,10 @@ import java.time.format.DateTimeParseException;
 import static io.digdag.standards.operator.state.PollingRetryExecutor.pollingRetryExecutor;
 import static io.digdag.standards.operator.state.PollingWaiter.pollingWaiter;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 public class BqWaitOperatorFactory implements OperatorFactory {
 
@@ -49,7 +56,28 @@ public class BqWaitOperatorFactory implements OperatorFactory {
             super(context);
             this.params = request.getConfig();
             this.state = TaskState.of(request);
-            this.bigquery = BigQueryOptions.getDefaultInstance().getService();
+            Optional<String> gcpCredentialOpt = context.getSecrets().getSecretOptional("gcp.credential");
+
+            Credentials credential;
+            Builder bqBuilder = BigQueryOptions.newBuilder();
+            bqBuilder.setHeaderProvider(FixedHeaderProvider.create("user-agent", "digdag"));
+
+            if (gcpCredentialOpt.isPresent()) {
+                try {
+                    credential = ServiceAccountCredentials.fromStream(
+                            new ByteArrayInputStream(gcpCredentialOpt.get().getBytes(StandardCharsets.UTF_8)));
+                } catch (IOException e) {
+                    throw new ConfigException("Invalid credential: " + gcpCredentialOpt.get(), e);
+                }
+            } else {
+                try {
+                    credential = ServiceAccountCredentials.getApplicationDefault();
+                } catch (IOException e) {
+                    throw new ConfigException("Could not get application default credential.", e);
+                }
+            }
+
+            this.bigquery = bqBuilder.setCredentials(credential).build().getService();
         }
 
         @Override

@@ -1,8 +1,11 @@
 package net.rhase.digdag.plugin.gcp
 
+import com.google.cloud.bigquery.BigQueryException
 import com.google.cloud.bigquery.BigQueryOptions
 import com.google.common.base.Optional
+import io.digdag.core.workflow.OperatorTestingUtils
 import io.digdag.spi.ImmutableTaskRequest
+import io.digdag.spi.SecretProvider
 import io.digdag.spi.TaskExecutionException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -12,7 +15,6 @@ import java.time.ZoneId
 import spock.lang.Specification
 
 import static io.digdag.client.config.ConfigUtils.newConfig
-import static io.digdag.core.workflow.OperatorTestingUtils.newContext
 
 import com.google.cloud.bigquery.TableId
 
@@ -22,7 +24,10 @@ import com.google.cloud.bigquery.TableId
  * - Application default credential is set up on your machine
  * - There is dataset named 'test_bq_wait' in your BQ.
  * - There are/aren't some tables in test_bq_wait.
+ * 
+ * Some features expect certain env val is defined.
  */
+
 // TODO Automate seting up test tables.
 class BqWaitOperatorSpec extends Specification {
     def opFactory = new BqWaitOperatorFactory()
@@ -100,17 +105,46 @@ class BqWaitOperatorSpec extends Specification {
         !e.isError()
     }
 
+    def "use gcp.credential"() {
+        when:
+        // This feature suppose you have created service account without any permission
+        // and you have set json key in the env val named "gcp_credential"
+        def gcpCredential = System.getenv("gcp_credential")
+        if(gcpCredential == null)
+            throw new RuntimeException("You must assign service account json key to env var 'gcp_credential' to run this spec.")
+
+        def mockSecretProvider = Stub(SecretProvider) {
+           getSecretOptional("gcp.credential") >> { Optional.of(gcpCredential) }
+        }
+        def result = runTask(Instant.now(), "test_bq_wait.table_found", mockSecretProvider)
+
+        then:
+        TaskExecutionException ex = thrown()
+        BigQueryException e = ex.getCause()
+        e.getCode() == 403
+        e.getReason().equals("accessDenied")
+    }
+
+    /*
+    *  Helper methods.
+    */
     def getLastModifiedTime(String table_name) {
         def (dataset, table) = table_name.split("\\.")
         Instant.ofEpochMilli(bigquery.getTable(dataset, table).getLastModifiedTime())
     }
 
     def runTask(Instant sessionTime, String table_spec) {
-        runTask(sessionTime, table_spec, null) 
+        runTask(sessionTime, table_spec, "") 
+    }
+
+    def runTask(Instant sessionTime, String table_spec, SecretProvider secrets) {
+        def context = OperatorTestingUtils.newContext(pjPath, newTaskRequest(sessionTime, table_spec, ""), secrets)
+        def op = opFactory.newOperator(context)
+        op.runTask()
     }
 
     def runTask(Instant sessionTime, String table_spec, String updated_after) {
-        def context = newContext(pjPath, newTaskRequest(sessionTime, table_spec, updated_after))
+        def context = OperatorTestingUtils.newContext(pjPath, newTaskRequest(sessionTime, table_spec, updated_after))
         def op = opFactory.newOperator(context)
         op.runTask()
     }
@@ -118,7 +152,7 @@ class BqWaitOperatorSpec extends Specification {
     def newTaskRequest(Instant sessionTime, String command, String updated_after) {
         def param = newConfig()
         param.set("_command", command)
-        if(updated_after != null)
+        if(updated_after != null && !updated_after.isEmpty())
             param.set("updated_after", updated_after)
 
         ImmutableTaskRequest.builder()
