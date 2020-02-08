@@ -121,8 +121,7 @@ class BqWaitOperatorSpec extends Specification {
         then:
         TaskExecutionException ex = thrown()
         BigQueryException e = ex.getCause()
-        e.getCode() == 403
-        e.getReason().equals("accessDenied")
+        e.getCode() == 403 && e.getReason().equals("accessDenied")
     }
 
     /*
