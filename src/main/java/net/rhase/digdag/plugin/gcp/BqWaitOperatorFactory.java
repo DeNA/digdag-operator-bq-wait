@@ -67,7 +67,7 @@ public class BqWaitOperatorFactory implements OperatorFactory {
                     credential = ServiceAccountCredentials.fromStream(
                             new ByteArrayInputStream(gcpCredentialOpt.get().getBytes(StandardCharsets.UTF_8)));
                 } catch (IOException e) {
-                    throw new ConfigException("Invalid credential: " + gcpCredentialOpt.get(), e);
+                    throw new ConfigException("Invalid credential.", e);
                 }
             } else {
                 try {
