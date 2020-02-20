@@ -16,7 +16,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package net.rhase.digdag.plugin.gcp;
+package com.dena.digdag.plugin.gcp;
 
 import com.google.api.gax.rpc.FixedHeaderProvider;
 import com.google.auth.Credentials;
@@ -109,16 +109,16 @@ public class BqWaitOperatorFactory implements OperatorFactory {
             String[] cmdArray = cmd.split("\\.");
             TableId tableId;
             switch (cmdArray.length) {
-            case 2:
-                // [dataset_name].[table_name]
-                tableId = TableId.of(cmdArray[0], cmdArray[1]);
-                break;
-            case 3:
-                // {project_id}.[dataset_name].[table_name]
-                tableId = TableId.of(cmdArray[0], cmdArray[1], cmdArray[2]);
-                break;
-            default:
-                throw new ConfigException("Invalid table specification: " + cmd);
+                case 2:
+                    // [dataset_name].[table_name]
+                    tableId = TableId.of(cmdArray[0], cmdArray[1]);
+                    break;
+                case 3:
+                    // {project_id}.[dataset_name].[table_name]
+                    tableId = TableId.of(cmdArray[0], cmdArray[1], cmdArray[2]);
+                    break;
+                default:
+                    throw new ConfigException("Invalid table specification: " + cmd);
             }
 
             Duration updatedAfter = null;

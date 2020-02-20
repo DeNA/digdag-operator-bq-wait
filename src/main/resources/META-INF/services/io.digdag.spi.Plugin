@@ -1,1 +1,1 @@
-net.rhase.digdag.plugin.gcp.BqWaitPlugin
+com.dena.digdag.plugin.gcp.BqWaitPlugin

@@ -16,7 +16,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package net.rhase.digdag.plugin.gcp;
+package com.dena.digdag.plugin.gcp;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package net.rhase.digdag.plugin.gcp
+package com.dena.digdag.plugin.gcp
 
 import com.google.cloud.bigquery.BigQueryException
 import com.google.cloud.bigquery.BigQueryOptions
