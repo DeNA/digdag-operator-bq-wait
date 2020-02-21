@@ -109,26 +109,26 @@ public class BqWaitOperatorFactory implements OperatorFactory {
             String[] cmdArray = cmd.split("\\.");
             TableId tableId;
             switch (cmdArray.length) {
-                case 2:
-                    // [dataset_name].[table_name]
-                    tableId = TableId.of(cmdArray[0], cmdArray[1]);
-                    break;
-                case 3:
-                    // {project_id}.[dataset_name].[table_name]
-                    tableId = TableId.of(cmdArray[0], cmdArray[1], cmdArray[2]);
-                    break;
-                default:
-                    throw new ConfigException("Invalid table specification: " + cmd);
+            case 2:
+                // [dataset_name].[table_name]
+                tableId = TableId.of(cmdArray[0], cmdArray[1]);
+                break;
+            case 3:
+                // {project_id}.[dataset_name].[table_name]
+                tableId = TableId.of(cmdArray[0], cmdArray[1], cmdArray[2]);
+                break;
+            default:
+                throw new ConfigException("Invalid table specification: " + cmd);
             }
 
             Duration updatedAfter = null;
             if (updatedAfterParam.isPresent()) {
                 try {
                     // 'updated_after' must be in ISO-8601 duration format
-                    // https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-
+                    // https://docs.oracle.com/javase/9/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-
                     updatedAfter = Duration.parse(updatedAfterParam.get());
                 } catch (DateTimeParseException e) {
-                    throw new ConfigException("updated_after must be ISO-8601 duration.", e);
+                    throw new ConfigException("updated_after must be ISO-8601 duration: " + updatedAfterParam.get(), e);
                 }
             }
 
