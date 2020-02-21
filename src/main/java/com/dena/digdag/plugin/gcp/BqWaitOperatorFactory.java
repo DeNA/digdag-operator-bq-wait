@@ -149,13 +149,13 @@ public class BqWaitOperatorFactory implements OperatorFactory {
                 lastModifiedTime = table.getLastModifiedTime();
             }
 
-            Config reqParams = request.getConfig().getFactory().create();
-            Config resParams = reqParams.getNestedOrSetEmpty("bq_wait").getNestedOrSetEmpty("last_object");
-            resParams.set("table", table.getFriendlyName());
+            Config params = request.getConfig().getFactory().create();
+            Config resParams = params.getNestedOrSetEmpty("bq_wait").getNestedOrSetEmpty("last_object");
+            resParams.set("table", table.getTableId());
             resParams.set("last_modified_time", lastModifiedTime);
 
             return TaskResult.defaultBuilder(request)
-                    .resetStoreParams(ImmutableList.of(ConfigKey.of("bq_wait", "last_object"))).storeParams(resParams)
+                    .resetStoreParams(ImmutableList.of(ConfigKey.of("bq_wait", "last_object"))).storeParams(params)
                     .build();
         }
 
