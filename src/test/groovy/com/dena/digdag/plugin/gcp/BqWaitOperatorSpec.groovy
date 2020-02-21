@@ -82,7 +82,7 @@ class BqWaitOperatorSpec extends Specification {
         !e.isError()
     }
 
-    def "table updated"() {
+    def "table updated after session time"() {
         when:
         def table_name =  "test_bq_wait.partition"
         def lastModifiedTime = getLastModifiedTime(table_name)
@@ -103,6 +103,17 @@ class BqWaitOperatorSpec extends Specification {
         then:
         TaskExecutionException e = thrown()
         !e.isError()
+    }
+
+    def "table updated before session time"() {
+        when:
+        def table_name =  "test_bq_wait.partition"
+        def lastModifiedTime = getLastModifiedTime(table_name)
+        def sessionTime = lastModifiedTime.plus(1, ChronoUnit.HOURS)
+        def result = runTask(sessionTime,table_name, "-PT1H")
+
+        then:
+        result != null
     }
 
     def "use gcp.credential"() {
