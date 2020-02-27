@@ -6,7 +6,7 @@ Wait for a table or a partition in Google BigQuery.
 _export:
   plugin:
     repositories:
-      - https://TBD/
+      - https://DeNA.github.io/analytics-maven-repo
     dependencies:
       - com.dena.digdag:digdag-operator-bq-wait:0.1.0
 
@@ -27,7 +27,7 @@ _export:
 You can also activate plugin with parameters below defined in config file (server.properties).  
 With these, you don't have to export plugin parameters in each dig file.
 ```
-system-plugin.repositories = https://TBD/
+system-plugin.repositories = https://DeNA.github.io/analytics-maven-repo
 system-plugin.dependencies = com.dena.digdag:digdag-operator-bq-wait:0.1.0
 ```
 
