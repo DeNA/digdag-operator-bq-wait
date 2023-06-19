@@ -103,7 +103,7 @@ dependencies {
     implementation group: 'io.digdag', name: 'digdag-standards', version: digdagVersion
     implementation group: 'io.digdag', name: 'digdag-spi', version: digdagVersion
     implementation group: 'io.digdag', name: 'digdag-plugin-utils', version: digdagVersion
-    implementation 'com.google.cloud:google-cloud-bigquery:1.105.0'
+    implementation 'com.google.cloud:google-cloud-bigquery:2.27.1'
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy-all:2.5.8'
