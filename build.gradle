@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.dena.digdag'
-version = '0.1.0'
+version = '0.1.1'
 
 def jdkVersion = '1.8'
 sourceCompatibility = jdkVersion
