@@ -15,7 +15,7 @@ def jdkVersion = '1.8'
 sourceCompatibility = jdkVersion
 targetCompatibility = jdkVersion
 
-def digdagVersion = '0.9.31'
+def digdagVersion = '0.10.5'
 
 wrapper {
     // Find the latest version at https://gradle.org/releases/
@@ -61,10 +61,7 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
 }
 
 repositories {
-    jcenter()
-    maven {
-        url 'https://dl.bintray.com/digdag/maven'
-    }
+    mavenCentral()
 }
 
 shadowJar {
