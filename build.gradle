@@ -1,11 +1,11 @@
 plugins {
     id 'java-library'
     id 'eclipse'
-    id 'com.diffplug.gradle.spotless' version '3.27.1'
-    id 'com.github.spotbugs' version '3.0.0'
+    id 'com.diffplug.spotless' version '5.17.1'
+    id 'com.github.spotbugs' version '5.0.14'
     id 'groovy' // For Spock
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'com.dena.digdag'
@@ -19,7 +19,7 @@ def digdagVersion = '0.10.5'
 
 wrapper {
     // Find the latest version at https://gradle.org/releases/
-    gradleVersion = '6.1'
+    gradleVersion = '8.1'
 }
 
 def _licenseHeader = '''\
@@ -55,17 +55,23 @@ spotbugs {
   toolVersion = '3.1.12'
 }
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-  reports.xml.enabled = false
-  reports.html.enabled = true
+spotbugsMain {
+  reports {
+    html {
+      enabled = true
+      stylesheet = 'fancy-hist.xsl'
+    }
+  }
 }
+
+spotbugsTest.enabled = false
 
 repositories {
     mavenCentral()
 }
 
 shadowJar {
-    classifier = null // ShadowJar automatically put 'all' classifier. So I turn it off.
+    archiveClassifier.set(null) // ShadowJar automatically put 'all' classifier. So I turn it off.
     dependencies {
         exclude(dependency('io.digdag:.*'))
     }
@@ -114,4 +120,13 @@ dependencies {
     testImplementation group: 'io.digdag', name: 'digdag-core', version: digdagVersion
     testImplementation group: 'io.digdag', name: 'digdag-core', version: digdagVersion, classifier: 'tests'
     testImplementation group: 'io.digdag', name: 'digdag-client', version: digdagVersion, classifier: 'tests'
+}
+
+task debug(type: DebugTask)
+
+class DebugTask extends DefaultTask {
+    @TaskAction
+    def debug() {
+        println System.getenv('gcp_pj')
+    }
 }
