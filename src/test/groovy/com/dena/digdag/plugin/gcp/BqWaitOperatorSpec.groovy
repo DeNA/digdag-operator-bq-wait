@@ -100,6 +100,30 @@ class BqWaitOperatorSpec extends Specification {
         !e.isError()
     }
 
+    def "monthly partition found"() {
+        when:
+        def result = runTask(Instant.now(), "test_bq_wait.partition_monthly\$202001")
+
+        then:
+        result != null
+    }
+
+    def "hourly partition found"() {
+        when:
+        def result = runTask(Instant.now(), "test_bq_wait.partition_hourly\$2020010100")
+
+        then:
+        result != null
+    }
+
+    def "yearly partition found"() {
+        when:
+        def result = runTask(Instant.now(), "test_bq_wait.partition_yearly\$2020")
+
+        then:
+        result != null
+    }
+
     def "table updated after session time"() {
         when:
         def table_name =  "test_bq_wait.partition"
