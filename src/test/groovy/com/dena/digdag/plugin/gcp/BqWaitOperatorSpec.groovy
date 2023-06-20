@@ -200,6 +200,7 @@ class BqWaitOperatorSpec extends Specification {
             .config(param)
             .localConfig(newConfig())
             .lastStateParams(newConfig())
+            .isCancelRequested(false)
             .build()
     }
 }
