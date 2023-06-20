@@ -8,7 +8,7 @@ _export:
     repositories:
       - https://DeNA.github.io/analytics-maven-repo
     dependencies:
-      - com.dena.digdag:digdag-operator-bq-wait:0.1.0
+      - com.dena.digdag:digdag-operator-bq-wait:0.1.1
 
 # Wait for a table to be created.
 +step1:
@@ -28,7 +28,7 @@ You can also activate plugin with parameters below defined in config file (serve
 With these, you don't have to export plugin parameters in each dig file.
 ```
 system-plugin.repositories = https://DeNA.github.io/analytics-maven-repo
-system-plugin.dependencies = com.dena.digdag:digdag-operator-bq-wait:0.1.0
+system-plugin.dependencies = com.dena.digdag:digdag-operator-bq-wait:0.1.1
 ```
 
 # Secrets (Optional)
