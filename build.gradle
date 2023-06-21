@@ -5,7 +5,6 @@ plugins {
     id 'com.github.spotbugs' version '5.0.14'
     id 'groovy' // For Spock
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'com.dena.digdag'
@@ -70,45 +69,37 @@ repositories {
     mavenCentral()
 }
 
-shadowJar {
-    archiveClassifier.set(null) // ShadowJar automatically put 'all' classifier. So I turn it off.
-    dependencies {
-        exclude(dependency('io.digdag:.*'))
-    }
-}
-
-def github_repo = System.getenv 'github_repo'
 def github_user = System.getenv 'github_user'
 def github_token = System.getenv 'github_token'
 
 publishing {
-    publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
-        }
+  publications {
+    maven(MavenPublication) {
+      from components.java
     }
+  }
 
     repositories {
         maven {
             name = 'local'
             url "$buildDir/repo"
         }
-
-        maven {
-            name = 'github_packages'
-            url 'https://maven.pkg.github.com/' + github_repo
-            credentials {
-                username = github_user
-                password = github_token
-            }
-        }
     }
 }
 
+configurations {
+    provided
+}
+
+sourceSets {
+    main { compileClasspath += configurations.provided }
+    test { runtimeClasspath += configurations.provided }
+}
+
 dependencies {
-    implementation group: 'io.digdag', name: 'digdag-standards', version: digdagVersion
-    implementation group: 'io.digdag', name: 'digdag-spi', version: digdagVersion
-    implementation group: 'io.digdag', name: 'digdag-plugin-utils', version: digdagVersion
+    provided group: 'io.digdag', name: 'digdag-standards', version: digdagVersion
+    provided group: 'io.digdag', name: 'digdag-spi', version: digdagVersion
+    provided group: 'io.digdag', name: 'digdag-plugin-utils', version: digdagVersion
     implementation 'com.google.cloud:google-cloud-bigquery:2.27.1'
 
     // Use the latest Groovy version for Spock testing
